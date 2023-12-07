@@ -1,6 +1,9 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using NodaTime;
 using ProjectManager.Data;
+using ProjectManager.Data.Entities;
 
 namespace ProjectManager.Api;
 
@@ -26,8 +29,26 @@ public class Startup
              });
          });
 
-        services.AddSingleton<IClock>(SystemClock.Instance);
+        services.AddIdentityCore<ApplicationUser>(options =>
+            options.SignIn.RequireConfirmedAccount = true
+            )
+            .AddEntityFrameworkStores<ApplicationDbContext>()
+            .AddSignInManager();
 
+        services.Configure<IdentityOptions>(options =>
+        {
+            options.Password.RequireDigit = true;
+            options.Password.RequireLowercase = true;
+            options.Password.RequireNonAlphanumeric = true;
+            options.Password.RequireUppercase = true;
+            options.Password.RequiredLength = 6;
+            options.Password.RequiredUniqueChars = 1;
+        });
+
+        services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+            .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme);
+
+        services.AddSingleton<IClock>(SystemClock.Instance);
         
         services.AddControllers()
             .AddNewtonsoftJson();
@@ -46,6 +67,8 @@ public class Startup
         }
 
         app.UseRouting();
+
+        app.UseAuthentication();
         app.UseAuthorization();
         app.UseEndpoints(endpoints =>
         {

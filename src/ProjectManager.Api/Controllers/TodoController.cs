@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +10,7 @@ using ProjectManager.Data.Entities;
 using ProjectManager.Data.Interfaces;
 
 namespace ProjectManager.Api.Controllers;
+[Authorize]
 [ApiController]
 public class TodoController : ControllerBase
 {
