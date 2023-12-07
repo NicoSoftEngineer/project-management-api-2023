@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -11,6 +12,7 @@ using ProjectManager.Data.Entities;
 using ProjectManager.Data.Interfaces;
 
 namespace ProjectManager.Api.Controllers;
+[Authorize]
 [ApiController]
 public class ProjectController : ControllerBase
 {
