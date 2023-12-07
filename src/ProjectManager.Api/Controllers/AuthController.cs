@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using NodaTime;
 using ProjectManager.Api.Controllers.Models.Auth;
 using ProjectManager.Data.Entities;
+using System.Security.Claims;
 
 namespace ProjectManager.Api.Controllers;
 [ApiController]
@@ -27,7 +28,7 @@ public class AuthController : ControllerBase
         _userManager = userManager;
     }
 
-    [HttpPost("api/v1/Account/Register")]
+    [HttpPost("api/v1/Auth/Register")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> Register(
@@ -48,10 +49,10 @@ public class AuthController : ControllerBase
         await _userManager.CreateAsync(newUser);
         await _userManager.AddPasswordAsync(newUser, model.Password);
 
-        return Ok();
+        return NoContent();
     }
 
-    [HttpPost("api/v1/Account/Login")]
+    [HttpPost("api/v1/Auth/Login")]
     public async Task<ActionResult> Login([FromBody] LoginModel model)
     {
         var user = await _userManager.FindByNameAsync(model.Email);
@@ -75,7 +76,25 @@ public class AuthController : ControllerBase
         return Ok();
     }
 
-    [HttpPost("api/v1/Account/Logout")]
+    [HttpGet("api/v1/Auth/UserInfo")]
+    public async Task<ActionResult<string>> UserInfo()
+    {
+        if (User.Identity == null || !User.Identity.IsAuthenticated)
+        {
+            throw new InvalidOperationException("user not logged in");
+        }
+        var name = User.Claims.First(x => x.Type == ClaimTypes.Name).Value;
+
+        if (User.Identity == null || !User.Identity.IsAuthenticated)
+        {
+            throw new InvalidOperationException("user not logged in");
+        }
+        var idString = User.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value;
+        var guid = Guid.Parse(idString);
+        return Ok($"{name} ({guid})");
+    }
+
+    [HttpPost("api/v1/Auth/Logout")]
     public async Task<ActionResult> Logout()
     {
         await HttpContext.SignOutAsync();
