@@ -8,6 +8,7 @@ using NodaTime;
 using ProjectManager.Api.Controllers.Models.Auth;
 using ProjectManager.Data.Entities;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace ProjectManager.Api.Controllers;
 [ApiController]
@@ -51,7 +52,8 @@ public class AuthController : ControllerBase
 
         if (!checkPassword.Succeeded)
         {
-            return BadRequest("Password does not meet requirements!!");
+            ModelState.AddModelError<RegisterModel>(x => x.Password, "Password does not meet the requirements!!!!");
+            return ValidationProblem(ModelState);
         }
 
         await _userManager.CreateAsync(newUser);
