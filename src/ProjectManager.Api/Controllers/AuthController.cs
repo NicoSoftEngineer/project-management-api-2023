@@ -35,6 +35,7 @@ public class AuthController : ControllerBase
        [FromBody] RegisterModel model
        )
     {
+        var validator = new PasswordValidator<ApplicationUser>();
         var now = _clock.GetCurrentInstant();
 
         var newUser = new ApplicationUser
@@ -46,10 +47,17 @@ public class AuthController : ControllerBase
             EmailConfirmed = true,
         }.SetCreateBySystem(now);
 
+        var checkPassword = await validator.ValidateAsync(_userManager, newUser, model.Password);
+
+        if (!checkPassword.Succeeded)
+        {
+            return BadRequest("Password does not meet requirements!!");
+        }
+
         await _userManager.CreateAsync(newUser);
         await _userManager.AddPasswordAsync(newUser, model.Password);
 
-        return NoContent();
+        return Ok();
     }
 
     [HttpPost("api/v1/Auth/Login")]
