@@ -8,6 +8,7 @@ using NodaTime;
 using ProjectManager.Api.Controllers.Models.Auth;
 using ProjectManager.Data.Entities;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace ProjectManager.Api.Controllers;
 [ApiController]
@@ -35,6 +36,7 @@ public class AuthController : ControllerBase
        [FromBody] RegisterModel model
        )
     {
+        var validator = new PasswordValidator<ApplicationUser>();
         var now = _clock.GetCurrentInstant();
 
         var newUser = new ApplicationUser
@@ -46,10 +48,18 @@ public class AuthController : ControllerBase
             EmailConfirmed = true,
         }.SetCreateBySystem(now);
 
+        var checkPassword = await validator.ValidateAsync(_userManager, newUser, model.Password);
+
+        if (!checkPassword.Succeeded)
+        {
+            ModelState.AddModelError<RegisterModel>(x => x.Password, "Password does not meet the requirements!!!!");
+            return ValidationProblem(ModelState);
+        }
+
         await _userManager.CreateAsync(newUser);
         await _userManager.AddPasswordAsync(newUser, model.Password);
 
-        return NoContent();
+        return Ok();
     }
 
     [HttpPost("api/v1/Auth/Login")]
