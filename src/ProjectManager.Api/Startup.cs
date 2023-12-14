@@ -1,7 +1,11 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using NodaTime;
+using ProjectManager.Api.BackgroundServices;
+using ProjectManager.Api.Services;
+using ProjectManager.Api.Settings;
 using ProjectManager.Data;
 using ProjectManager.Data.Entities;
 
@@ -49,7 +53,11 @@ public class Startup
             .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme);
 
         services.AddSingleton<IClock>(SystemClock.Instance);
-        
+        services.AddScoped<EmailSenderService>();
+        services.AddHostedService<EmailSenderBackgroundService>();
+
+        services.Configure<SmtpSettings>(_configuration.GetSection("SmtpSettings"));
+
         services.AddControllers()
             .AddNewtonsoftJson();
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

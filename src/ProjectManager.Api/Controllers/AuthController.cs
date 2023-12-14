@@ -9,6 +9,7 @@ using ProjectManager.Api.Controllers.Models.Auth;
 using ProjectManager.Data.Entities;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ProjectManager.Api.Controllers;
 [ApiController]
@@ -52,7 +53,8 @@ public class AuthController : ControllerBase
 
         if (!checkPassword.Succeeded)
         {
-            ModelState.AddModelError<RegisterModel>(x => x.Password, "Password does not meet the requirements!!!!");
+            ModelState.AddModelError<RegisterModel>(
+                x => x.Password, string.Join("\n", checkPassword.Errors.Select(x => x.Description)));
             return ValidationProblem(ModelState);
         }
 
@@ -104,6 +106,7 @@ public class AuthController : ControllerBase
         return Ok($"{name} ({guid})");
     }
 
+    [Authorize]
     [HttpPost("api/v1/Auth/Logout")]
     public async Task<ActionResult> Logout()
     {

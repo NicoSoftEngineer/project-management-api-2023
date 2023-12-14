@@ -10,7 +10,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
 
     public DbSet<Project> Projects { get; set; } = null!;
 
-    //public DbSet<ApplicationUser> Users { get; set; } = null!;
+    public DbSet<Email> Emails { get; set; } = null!;
 
     public ApplicationDbContext(DbContextOptions options) : base(options)
     {
