@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using NodaTime;
 using NodaTime.Text;
 using ProjectManager.Api.Controllers.Models.Projects;
+using ProjectManager.Api.Controllers.Models.Statuses;
 using ProjectManager.Api.Controllers.Models.Todos;
 using ProjectManager.Data;
 using ProjectManager.Data.Entities;
@@ -37,6 +38,7 @@ public class ProjectController : ControllerBase
         var dbEntities = await _dbContext
             .Set<Project>()
             .Include(x => x.Todos)
+            .Include(x => x.Statuses)
             .FilterDeleted()
             .ToListAsync();
 
@@ -44,12 +46,14 @@ public class ProjectController : ControllerBase
     }
 
     [HttpGet("api/v1/Project/{id}")]
-    public async Task<ActionResult<IEnumerable<ProjectDetailModel>>> Get(
+    public async Task<ActionResult<ProjectDetailModel>> Get(
         [FromRoute] Guid id
         )
     {
         var dbEntity = await _dbContext
             .Set<Project>()
+            .Include(x => x.Todos)
+            .Include(x => x.Statuses)
             .FilterDeleted()
             .FirstOrDefaultAsync(x => x.Id == id);
 
@@ -71,6 +75,7 @@ public class ProjectController : ControllerBase
                 Description = y.Description,
                 CreatedAt = InstantPattern.ExtendedIso.Format(y.CreatedAt),
             }),
+            Statuses = dbEntity.Statuses.Select(x => x.ToDetail()),
         };
 
         return Ok(result);

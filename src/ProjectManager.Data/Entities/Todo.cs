@@ -8,6 +8,9 @@ public class Todo : ITrackable
 
     public string? Description { get; set; }
 
+    public Guid StatusId { get; set; }
+    public Status Status { get; set; } = null!;
+
     public Guid ProjectId { get; set; }
     public Project Project { get; set; } = null!;
 

@@ -1,4 +1,5 @@
 using NodaTime.Text;
+using ProjectManager.Api.Controllers.Models.Statuses;
 using ProjectManager.Api.Controllers.Models.Todos;
 using ProjectManager.Data.Entities;
 
@@ -15,6 +16,8 @@ public class ProjectDetailModel
     public string CreatedAt { get; set; } = null!;
 
     public IEnumerable<TodoDetailModel> Todos { get; set; } = Enumerable.Empty<TodoDetailModel>();
+
+    public IEnumerable<StatusDetailModel> Statuses { get; set; } = Enumerable.Empty<StatusDetailModel>();
 }
 
 public static class ProjectDetailModelExtensions
@@ -27,5 +30,6 @@ public static class ProjectDetailModelExtensions
             Description = source.Description,
             CreatedAt = InstantPattern.ExtendedIso.Format(source.CreatedAt),
             Todos = source.Todos.Select(x => x.ToDetail()),
+            Statuses = source.Statuses.Select(x => x.ToDetail()),
         };
 }

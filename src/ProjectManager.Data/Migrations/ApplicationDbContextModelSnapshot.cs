@@ -212,6 +212,49 @@ namespace ProjectManager.Data.Migrations
                     b.ToTable("Projects");
                 });
 
+            modelBuilder.Entity("ProjectManager.Data.Entities.Status", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Instant>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Instant?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsDone")
+                        .HasColumnType("boolean");
+
+                    b.Property<Instant>("ModifiedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("ProjectId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProjectId");
+
+                    b.ToTable("Status");
+                });
+
             modelBuilder.Entity("ProjectManager.Data.Entities.Todo", b =>
                 {
                     b.Property<Guid>("Id")
@@ -244,6 +287,9 @@ namespace ProjectManager.Data.Migrations
                     b.Property<Guid>("ProjectId")
                         .HasColumnType("uuid");
 
+                    b.Property<Guid>("StatusId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("text");
@@ -252,7 +298,20 @@ namespace ProjectManager.Data.Migrations
 
                     b.HasIndex("ProjectId");
 
+                    b.HasIndex("StatusId");
+
                     b.ToTable("Todo");
+                });
+
+            modelBuilder.Entity("ProjectManager.Data.Entities.Status", b =>
+                {
+                    b.HasOne("ProjectManager.Data.Entities.Project", "Project")
+                        .WithMany("Statuses")
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Project");
                 });
 
             modelBuilder.Entity("ProjectManager.Data.Entities.Todo", b =>
@@ -263,10 +322,25 @@ namespace ProjectManager.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("ProjectManager.Data.Entities.Status", "Status")
+                        .WithMany("Todos")
+                        .HasForeignKey("StatusId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Project");
+
+                    b.Navigation("Status");
                 });
 
             modelBuilder.Entity("ProjectManager.Data.Entities.Project", b =>
+                {
+                    b.Navigation("Statuses");
+
+                    b.Navigation("Todos");
+                });
+
+            modelBuilder.Entity("ProjectManager.Data.Entities.Status", b =>
                 {
                     b.Navigation("Todos");
                 });

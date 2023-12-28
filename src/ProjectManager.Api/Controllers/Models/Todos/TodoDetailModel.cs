@@ -1,4 +1,6 @@
 using NodaTime.Text;
+using ProjectManager.Api.Controllers.Models.InnerModels;
+using ProjectManager.Api.Controllers.Models.Statuses;
 using ProjectManager.Data.Entities;
 
 namespace ProjectManager.Api.Controllers.Models.Todos;
@@ -10,6 +12,8 @@ public class TodoDetailModel
     public string Title { get; set; } = null!;
 
     public string? Description { get; set; }
+
+    public GenericInnerModel Status { get; set; } = null!;
 
     public string CreatedAt { get; set; } = null!;
 }
@@ -40,6 +44,7 @@ public static class TodoDetailModelExtensions
             Id = source.Id,
             Description = source.Description,
             Title = source.Title,
+            Status = new GenericInnerModel() { Id = source.StatusId, Name = source.Status.Title},
             CreatedAt = InstantPattern.ExtendedIso.Format(source.CreatedAt),
         };
 }
