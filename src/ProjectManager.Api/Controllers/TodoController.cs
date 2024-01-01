@@ -4,6 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NodaTime;
 using NodaTime.Text;
+using ProjectManager.Api.Controllers.Models.InnerModels;
+using ProjectManager.Api.Controllers.Models.Projects;
+using ProjectManager.Api.Controllers.Models.Statuses;
 using ProjectManager.Api.Controllers.Models.Todos;
 using ProjectManager.Data;
 using ProjectManager.Data.Entities;
@@ -36,6 +39,7 @@ public class TodoController : ControllerBase
     {
         var query = _dbContext
             .Set<Todo>()
+            .Include(x => x.Status)
             .FilterDeleted()
             .ApplyFilter(filter)
             ;
@@ -52,6 +56,7 @@ public class TodoController : ControllerBase
     {
         var dbEntity = await _dbContext
             .Set<Todo>()
+            .Include(x => x.Status)
             .FilterDeleted()
             .SingleOrDefaultAsync(x => x.Id == id);
 
@@ -75,6 +80,7 @@ public class TodoController : ControllerBase
             Title = model.Title,
             Description = model.Description,
             ProjectId = model.ProjectId,
+            StatusId = model.StatusId,
         }.SetCreateBySystem(now);
 
         _dbContext.Add(newTodo);
@@ -129,6 +135,7 @@ public class TodoController : ControllerBase
             Description = dbEntity.Description,
             Title = dbEntity.Title,
             CreatedAt = InstantPattern.ExtendedIso.Format(dbEntity.CreatedAt),
+            Status = new GenericInnerModel() { Id = dbEntity.StatusId, Name = dbEntity.Status.Title },
         });
     }
 
