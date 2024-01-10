@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using NodaTime;
+using ProjectManager.Api.Controllers.Models.InnerModels;
 using ProjectManager.Api.Controllers.Models.Todos;
 using ProjectManager.Data.Entities;
 
@@ -14,7 +15,7 @@ public class StatusDetailModel
     public string Title { get; set; } = null!;
 
     [JsonProperty("project")]
-    public Project Project { get; set; } = null!;
+    public GenericInnerModel Project { get; set; } = null!;
 
     [JsonProperty("todos")]
     public IEnumerable<TodoDetailModel> Todos { get; set; } = Enumerable.Empty<TodoDetailModel>();
@@ -32,7 +33,7 @@ public static class StatusDetailModelExtensions
         {
             Id = source.Id,
             Title = source.Title,
-            Project = source.Project,
+            Project = new GenericInnerModel() { Id = source.ProjectId, Name = source.Project.Title },
             Todos = source.Todos.Select(x => x.ToDetail()),
             IsDone = source.IsDone,
             CreatedAt = source.CreatedAt,
