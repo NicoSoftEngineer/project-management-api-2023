@@ -103,7 +103,7 @@ public class StatusController : ControllerBase
             return BadRequest();
         }
         dbEntity.SetDeleteBySystem(_clock.GetCurrentInstant());
-        _dbContext.SaveChanges();
+        await _dbContext.SaveChangesAsync();
         return NoContent();
     }
 }
